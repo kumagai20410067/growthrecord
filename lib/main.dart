@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'memo.dart';
 
 DateTime _focused = DateTime.now();
 DateTime? _selected;
@@ -41,26 +42,53 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        endDrawer: Drawer(
+        //endDrawerで右側になる
+        drawer: Drawer(
           child: ListView(
-            children: const[
-              DrawerHeader(
-                decoration:BoxDecoration(color:Colors.yellow
+          children:<Widget>[
+
+          Container(
+                child: DrawerHeader(
+                  child: Text(
+                    "Header",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  decoration: BoxDecoration(color: Colors.blue),
                 ),
-                child: Text("My Home Page")),
-                //仮置き
-              ListTile(title: Text("data")),
-              ListTile(title: Text("data2")),
-              ListTile(title: Text("data3"))
-                //仮置き
-            ],
+                height: 120),
+
+                Container(
+              child: ListTile(
+                title: Text("item1"),
+                trailing: Icon(Icons.arrow_forward),
+               onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MemoPage(),
+                ),
+              );
+            },
+              ),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey),
+                ),
+              ),
+            ),
+        ]
+ )
           ),
-        ),
+            
+          
+          
+
+        
         body: Center(
           child: TableCalendar(
             locale: 'ja_JP',
             firstDay: DateTime.utc(2023, 4, 1),
-            lastDay: DateTime.utc(2025, 12, 31),
+            lastDay: DateTime.utc(2030, 12, 31),
             selectedDayPredicate: (day) {
               return isSameDay(_selected, day);
             },
