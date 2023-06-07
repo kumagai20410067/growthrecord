@@ -1,11 +1,23 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'memo.dart';
 
-DateTime _focused = DateTime.now();
-DateTime? _selected;
+// class CalendarPage extends StatefulWidget{
+//   const CalendarPage({key? key}):super(key :key);
 
+//   @override
+// State<CalendarPage>createState()=>_CalendarPageState();
+// }
+
+// class _CalendarPageState extends State<CalendarPage>{
+ 
+// }
+
+ DateTime _focusedDay = DateTime.now();
+DateTime? _selectedDay;
+CalendarFormat _calendarFormat = CalendarFormat.month;
 void main() {
   //runApp(const MyApp());
 initializeDateFormatting('ja').then((_) => runApp(MyApp()));
@@ -85,22 +97,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
         
         body: Center(
+
+           
+
           child: TableCalendar(
             locale: 'ja_JP',
-            firstDay: DateTime.utc(2023, 4, 1),
+            firstDay: DateTime.utc(2010, 4, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             selectedDayPredicate: (day) {
-              return isSameDay(_selected, day);
+              return isSameDay(_selectedDay, day);
             },
-            onDaySelected: (selected, focused) {
-              if (!isSameDay(_selected, selected)) {
+            onDaySelected: (selectedDay, focused) {
+              if (!isSameDay(_selectedDay, selectedDay)) {
                 setState(() {
-                  _selected = selected;
-                  _focused = focused;
+                  _selectedDay = selectedDay;
+                  _focusedDay = focused;
                 });
               }
             },
-            focusedDay: _focused,
+            focusedDay: _focusedDay,
+           onFormatChanged: (format) {  // 「月」「週」変更
+                  if (_calendarFormat != format) {
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  }
+                }
           ),
         ));
   }
