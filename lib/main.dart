@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'GROWTH RECORD',
       theme: ThemeData(
-        primarySwatch: Colors.blue,fontFamily: 'NotoSansJP'
+        primarySwatch: Colors.purple,fontFamily: 'NotoSansJP'
       ),
       home: const MyHomePage(title: 'GROWTH RECORD'),
     );
