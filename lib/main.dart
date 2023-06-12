@@ -4,17 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'memo.dart';
 
-// class CalendarPage extends StatefulWidget{
-//   const CalendarPage({key? key}):super(key :key);
-
-//   @override
-// State<CalendarPage>createState()=>_CalendarPageState();
-// }
-
-// class _CalendarPageState extends State<CalendarPage>{
- 
-// }
-
  DateTime _focusedDay = DateTime.now();
 DateTime? _selectedDay;
 CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -104,6 +93,8 @@ class _MyHomePageState extends State<MyHomePage> {
             locale: 'ja_JP',
             firstDay: DateTime.utc(2010, 4, 1),
             lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
             },
@@ -115,7 +106,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               }
             },
-            focusedDay: _focusedDay,
+
+            calendarFormat: _calendarFormat,
+
            onFormatChanged: (format) {  // 「月」「週」変更
                   if (_calendarFormat != format) {
                     setState(() {
