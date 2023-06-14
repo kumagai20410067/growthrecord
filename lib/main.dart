@@ -6,9 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'memo.dart';
 
 
-
-
-
 void main() {
   //runApp(const MyApp());
 initializeDateFormatting('ja').then((_) => runApp(MyApp()));
@@ -40,32 +37,40 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-   DateTime _focusedDay = DateTime.now();
-   DateTime? _selectedDay;
+   DateTime _focused = DateTime.now();
+   DateTime? _selected;
    CalendarFormat _calendarFormat = CalendarFormat.month;
    Map<DateTime, List> _eventsList = {};
-  DateTime? _selected;
-   DateTime _focused = DateTime.now();
+ 
+//  Map<DateTime, Map<String, String>> _events;
+//  CalendarController _calendarController;
+   
 
-//イベントの追加
+//イベントの追加（仮）
   int getHashCode(DateTime key) {
     return key.day * 1000000 + key.month * 10000 + key.year;
   }
+
   @override
   void initState() {
     super.initState();
 
     _selected = _focused;
     _eventsList = {
-      DateTime.now().subtract(Duration(days: 2)): ['Test A', 'Test B'],
+      DateTime.now().subtract(Duration(days: 10)): ['Test A', 'Test B'],
       DateTime.now(): ['Test C', 'Test D', 'Test E', 'Test F'],
     };
   }
-//イベントの追加
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _calendarController = CalendarController();
+  //   _events = {};
+  // }
 
   @override
   Widget build(BuildContext context) {
-//イベントの追加
     final _events = LinkedHashMap<DateTime, List>(
       equals: isSameDay,
       hashCode: getHashCode,
@@ -74,11 +79,13 @@ class _MyHomePageState extends State<MyHomePage> {
     List getEvent(DateTime day) {
       return _events[day] ?? [];
     }
-//イベントの追加
+//イベントの追加（仮）
+
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
+
         //ハンバーガーメニュー
         //endDrawerで右側になる
         drawer: Drawer(
@@ -115,25 +122,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
         ])),
           //ハンバーガーメニュー
-           
+
+           //カレンダーを表示
         body: Column(children: [
-          //カレンダーを表示
-           TableCalendar(
-            locale: 'ja_JP',
+          TableCalendar(
+            locale: 'ja_JP',//日本語対応
             firstDay: DateTime.utc(2010, 4, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             eventLoader: getEvent,
-            focusedDay: _focusedDay,
+            focusedDay:_focused,
 
             //日付を選択可能に
             selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
+              return isSameDay(_selected, day);
             },
             onDaySelected: (selectedDay, focused) {
-              if (!isSameDay(_selectedDay, selectedDay)) {
+              if (!isSameDay(_selected, selectedDay)) {
                 setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focused;
+                  _selected = selectedDay;
+                  _focused = focused;
                 });
               }
             },
@@ -149,6 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                 },
           ),
+
+          //イベントを日付ごとに表示
            ListView(
             shrinkWrap: true,
             children: getEvent(_selected!)
@@ -157,6 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ))
                 .toList(),
           )
+          
         ]));
   }
 }
