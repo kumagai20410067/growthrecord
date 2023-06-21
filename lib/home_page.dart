@@ -59,6 +59,10 @@ class _MyHomePageState extends State<MyHomePage> {
 void initState(){
   super.initState();
   initializeSharedPreferences();
+
+    //アプリを開いたタイミングで開いた日付を選択した状態にする
+    _focused = DateTime.now();
+    _selected = DateTime.now();
 }
 
 void initializeSharedPreferences()async{
@@ -288,14 +292,13 @@ return ListView.builder(
                     child: _isRecordExisting ? const Text('更新'): const Text('保存'),
                     onPressed: (){
                     if(_heightController.text.isNotEmpty&&
-                       _weightController.text.isNotEmpty&&
-                       _memoController.text.isNotEmpty
+                       _weightController.text.isNotEmpty
                    )
                    {
                     Record record = Record(
                       height: double.tryParse(_heightController.text)?? 0.0,
                       weight:double.tryParse(_weightController.text)?? 0.0,
-                      memo: _memoController.text,
+                      memo: _memoController.text.isNotEmpty ? _memoController.text : 'なし',
                       );
                       if(_isRecordExisting){
                         deleteRecord(_selected!,_selectedEvents[0]);
