@@ -11,7 +11,11 @@ class Record{
   final double weight;
   final String memo;
 
-  Record({required this.name,required this.height,required this.weight,required this.memo});
+  Record({
+    required this.name,
+    required this.height,
+    required this.weight,
+    required this.memo});
 
 factory Record.fromJson(Map<String,dynamic>json){
   return Record(
@@ -57,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _memoController = TextEditingController();
 
   List<Record> _selectedEvents = [];
-  final bool _isRecordExisting= false;
+  bool _isRecordExisting= false;
   
 @override
 void initState(){
@@ -235,13 +239,14 @@ return ListView.builder(
                 setState(() {
                   _selected = selectedDay;
                   _focused = focused;
+                 _selectedEvents =_events[selectedDay] ?? [];
+                 _isRecordExisting= _recordExistenceMap[selectedDay] ?? false;
                 });
               }
             },
             
             // 「月」「週」変更
             calendarFormat: _calendarFormat,
-
            onFormatChanged: (format) {  
                   if (_calendarFormat != format) {
                     setState(() {
@@ -250,8 +255,10 @@ return ListView.builder(
                   }
                 },
           ),
-        ElevatedButton(onPressed: (){
-          showDialog(context: context,
+        ElevatedButton(
+          onPressed: (){
+          showDialog(
+            context: context,
            builder: (BuildContext context){
             return AlertDialog(
               title:  _isRecordExisting ? const Text('成長記録を更新する') : const Text('成長記録を入力する'),
