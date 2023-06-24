@@ -6,20 +6,17 @@ import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Record{
-  final String name;
   final double height;
   final double weight;
   final String memo;
 
   Record({
-    required this.name,
     required this.height,
     required this.weight,
     required this.memo});
 
 factory Record.fromJson(Map<String,dynamic>json){
   return Record(
-    name: json['name'],
     height: json['height'],
     weight: json['weight'],
     memo: json['memo'],
@@ -29,7 +26,6 @@ factory Record.fromJson(Map<String,dynamic>json){
 Map<String,dynamic> toJson()
 {
   return{
-    'name':name,
     'height':height,
     'weight':weight,
     'memo':memo,
@@ -55,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
    Map<DateTime,List<Record>> _events = {};
    Map<DateTime,bool> _recordExistenceMap = {};
 
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
@@ -143,7 +138,7 @@ return ListView.builder(
   itemBuilder: (BuildContext context,int index){
     Record record = _selectedEvents[index];
     return ListTile(
-      title: Text('名前： ${record.name}\n体長： ${record.height}cm\n体重：${record.weight}g\nメモ：${record.memo}'),
+      title: Text('体長： ${record.height}cm\n体重：${record.weight}g\nメモ：${record.memo}'),
       trailing: IconButton(
         icon: const Icon(Icons.delete),
         onPressed:(){
@@ -267,13 +262,6 @@ return ListView.builder(
                 children: [
                   //ここから
                   TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: '名前',
-                    ),
-                  ),
-                   //ここで入力欄一つ
-                  TextFormField(
                     controller: _heightController,
                     keyboardType: TextInputType.number,//キーボード入力を数字入力に変更
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],//数字のみ入力可能に
@@ -281,7 +269,8 @@ return ListView.builder(
                       labelText: '体長（cm）',
                     ),   
                   ),
-                 
+                   //ここで入力欄一つ
+
                   TextFormField(
                     controller: _weightController,
                     keyboardType: TextInputType.number,//キーボード入力を数字入力に変更
@@ -314,7 +303,6 @@ return ListView.builder(
                    )
                    {
                     Record record = Record(
-                      name: _nameController.text,
                       height: double.tryParse(_heightController.text)?? 0.0,
                       weight:double.tryParse(_weightController.text)?? 0.0,
                       memo: _memoController.text.isNotEmpty ? _memoController.text : 'なし',
