@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:growthrecord/memo.dart';
+import 'package:growthrecord/select_page.dart';
 import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:growthrecord/select_page.dart';
 
 class Record{
   final double height;
@@ -33,15 +35,17 @@ Map<String,dynamic> toJson()
 }
 }
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  final String selectedPet;
 
-  final String title;
+  const MyHomePage({Key? key, required this.selectedPet}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+   int _currentIndex = 1;
+
    DateTime _focused = DateTime.now();
    DateTime? _selected;
    CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -57,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Record> _selectedEvents = [];
   bool _isRecordExisting= false;
+
   
 @override
 void initState(){
@@ -107,12 +112,13 @@ void saveEvents(){
 void addRecord(DateTime date,Record record){
   setState((){
     if(_events[date] != null){
-      _events[date] !.add(record);
+      _events[date] = [record];
     }else{
       _events[date] = [record];
+      _recordExistenceMap[date]= true;
     }
     _selectedEvents = _events[date]!;
-    _recordExistenceMap[date] = true;
+    // _recordExistenceMap[date] = true;
   });
   saveEvents();
 }
@@ -179,44 +185,8 @@ return ListView.builder(
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text('${widget.selectedPet}の成長記録'),
         ),
-
-        //ハンバーガーメニュー
-        drawer: Drawer(
-          child: ListView(
-          children:<Widget>[
-          Container(
-                height: 120,
-                child: const DrawerHeader(
-                  decoration: BoxDecoration(color: Colors.purple),
-                  child: Text(
-                    "一覧",
-                    style: TextStyle(fontSize: 25,color: Colors.white),
-                  ),
-                )),
-
-                Container(
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey),
-                ),
-              ),
-              child: ListTile(
-                title: const Text("仮"),
-                trailing: const Icon(Icons.arrow_forward),
-               onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MemoPage(),
-                ),
-              );
-            },
-              ),
-            ),
-        ])),
-          //ハンバーガーメニュー
 
            //カレンダーを表示
         body: Column(children: [
@@ -314,6 +284,9 @@ return ListView.builder(
                       addRecord(_selected!, record);
                    }
                    Navigator.of(context).pop();
+                    setState(() {
+                    _isRecordExisting = true; // レコードが存在する状態に変更
+                  });
                   },
                   ),
                 ],
@@ -321,7 +294,9 @@ return ListView.builder(
            },
            );
         }, 
-        child: _isRecordExisting ? const Text('成長記録を更新する'): const Text('成長記録を入力する'),
+        child: _isRecordExisting 
+        ? const Text('成長記録を更新する')
+        : const Text('成長記録を入力する'),
         ),
       Expanded(
         child: SingleChildScrollView(
@@ -330,6 +305,51 @@ return ListView.builder(
           ),
         ],
         ),
+        bottomNavigationBar: BottomNavigationBar(
+          items:const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home'
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.date_range),
+              label: 'CaLendar'
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.show_chart),
+              label: 'Graph'
+              ),
+          ],
+          onTap: (int index){
+            setState(() {
+              _currentIndex = index;
+            });
+
+            switch(index){
+              case 0:
+                Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => const SelectPage()),
+             );
+               break;
+               case 1:
+                Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) =>  MyHomePage(selectedPet: widget.selectedPet)),
+             );
+               break;
+              case 2:
+                Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => MemoPage(selectedPet: widget.selectedPet,)),
+             );
+               break;
+            }
+          },
+          selectedItemColor: Colors.purple,
+          unselectedItemColor: Colors.grey,
+          currentIndex: _currentIndex,
+            ),
         );
   }
 }
