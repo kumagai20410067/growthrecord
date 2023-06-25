@@ -114,6 +114,7 @@ void addRecord(DateTime date,Record record){
     _selectedEvents = _events[date]!;
     _recordExistenceMap[date] = true;
   });
+  saveEvents();
 }
 //記録の消去
 void deleteRecord(DateTime date,Record record){
