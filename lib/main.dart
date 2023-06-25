@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:growthrecord/home_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:growthrecord/select_page.dart';
 
 void main() {
 initializeDateFormatting('ja').then((_) => runApp(const MyApp()));
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,fontFamily: 'NotoSansJP'
       ),
-      home: const MyHomePage(title: 'GROWTH RECORD'),
+      home: const SelectPage(),
     );
   }
 }
