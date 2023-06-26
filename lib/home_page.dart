@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:growthrecord/memo.dart';
+import 'package:growthrecord/graph_page.dart';
 import 'package:growthrecord/select_page.dart';
 import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,9 +68,9 @@ void initState(){
   super.initState();
   initializeSharedPreferences();
 
-    //アプリを開いたタイミングで開いた日付を選択した状態にする
-    _focused = DateTime.now();
-    _selected = DateTime.now();
+//アプリを開いたタイミングで開いた日付を選択した状態にする
+  _focused = DateTime.now();
+  _selected = DateTime.now();
 }
 
 void initializeSharedPreferences()async{
@@ -344,7 +344,7 @@ return ListView.builder(
               case 2:
                 Navigator.push(
                 context, 
-                MaterialPageRoute(builder: (context) => MemoPage(selectedPet: widget.selectedPet,)),
+                MaterialPageRoute(builder: (context) => GraphPage(selectedPet: widget.selectedPet,)),
              );
                break;
             }

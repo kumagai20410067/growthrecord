@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:growthrecord/home_page.dart';
 import 'package:growthrecord/select_page.dart';
-class MemoPage extends StatefulWidget {
+
+class GraphPage extends StatefulWidget {
 final String selectedPet;
 
-const MemoPage({Key? key, required this.selectedPet}) : super(key: key);
+const GraphPage({Key? key, required this.selectedPet}) : super(key: key);
 @override
-  State<MemoPage> createState() => _MemoPageState();
+  State<GraphPage> createState() => _GraphPageState();
 }
-class _MemoPageState extends State<MemoPage>{
+
+class _GraphPageState extends State<GraphPage>{
      int _currentIndex = 2;
 
   @override
@@ -55,7 +57,7 @@ bottomNavigationBar: BottomNavigationBar(
               case 2:
                 Navigator.push(
                 context, 
-                MaterialPageRoute(builder: (context) => MemoPage(selectedPet: widget.selectedPet,)),
+                MaterialPageRoute(builder: (context) => GraphPage(selectedPet: widget.selectedPet,)),
              );
                break;
             }
