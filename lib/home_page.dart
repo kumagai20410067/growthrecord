@@ -206,7 +206,7 @@ return ListView.builder(
                   _selected = selectedDay;
                   _focused = focused;
                  _selectedEvents =_events[selectedDay] ?? [];
-                 _isRecordExisting= _recordExistenceMap[selectedDay] ?? false;
+                _isRecordExisting = _events[_selected]?.isNotEmpty ?? false;
                 });
               }
             },
