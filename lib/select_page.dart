@@ -143,8 +143,7 @@ class _SelectPageState extends State<SelectPage> {
       context,
       MaterialPageRoute(
         builder: (context) => MyHomePage(
-          // title: '$selectedPetの成長記録',
-          selectedPet: selectedPet,
+          selectedPet: selectedPet
         ),
       ),
     );
