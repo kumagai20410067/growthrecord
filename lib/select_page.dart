@@ -62,6 +62,7 @@ class _SelectPageState extends State<SelectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('ペットを選択してください'),
         actions: [
           if (!_isAddingPet)
