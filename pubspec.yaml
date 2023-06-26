@@ -19,6 +19,7 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.18.1
   shared_preferences: ^2.1.1
+  fl_chart: ^0.63.0
 
   
   
