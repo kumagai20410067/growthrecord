@@ -5,7 +5,7 @@ import 'package:growthrecord/memo.dart';
 import 'package:growthrecord/select_page.dart';
 import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:growthrecord/select_page.dart';
+// import 'package:growthrecord/select_page.dart';
 
 class Record{
   final double height;
@@ -118,7 +118,6 @@ void addRecord(DateTime date,Record record){
       _recordExistenceMap[date]= true;
     }
     _selectedEvents = _events[date]!;
-    // _recordExistenceMap[date] = true;
   });
   saveEvents();
 }
@@ -185,6 +184,7 @@ return ListView.builder(
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text('${widget.selectedPet}の成長記録'),
         ),
 
@@ -229,7 +229,8 @@ return ListView.builder(
             return AlertDialog(
               title:  _isRecordExisting ? const Text('成長記録を更新する') : const Text('成長記録を入力する'),
               content:SingleChildScrollView(
-                child:Column(mainAxisSize: MainAxisSize.min,//余りのスペースをなくす
+                child:Column(
+                mainAxisSize: MainAxisSize.min,//余りのスペースをなくす
                 children: [
                   //ここから
                   TextFormField(
@@ -267,7 +268,9 @@ return ListView.builder(
                   child: const Text('キャンセル'),
                   ),
                   TextButton(
-                    child: _isRecordExisting ? const Text('更新'): const Text('保存'),
+                    child: _isRecordExisting 
+                    ? const Text('更新')
+                    : const Text('保存'),
                     onPressed: (){
                     if(_heightController.text.isNotEmpty&&
                        _weightController.text.isNotEmpty
@@ -285,7 +288,7 @@ return ListView.builder(
                    }
                    Navigator.of(context).pop();
                     setState(() {
-                    _isRecordExisting = true; // レコードが存在する状態に変更
+                    _isRecordExisting = _events[_selected!]?.isNotEmpty ?? false; // レコードが存在する状態に変更
                   });
                   },
                   ),
