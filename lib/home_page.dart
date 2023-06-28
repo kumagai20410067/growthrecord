@@ -60,8 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Record> _selectedEvents = [];
   bool _isRecordExisting = false;
-  double _previousHeight = 0.0;
-  double _previousWeight = 0.0;
 
   @override
   void initState() {
@@ -137,20 +135,31 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildRecordList() {
-    if (_selectedEvents.isEmpty) {
-      return const SizedBox();
-    }
-    return ListView.builder(
-      shrinkWrap: true, //ListViewの高さをlistview内で表示している要素をすべて表示したときの高さにする
-      physics:
-          const NeverScrollableScrollPhysics(), //スクロール不可設定
-      itemCount: _selectedEvents.length,
-      itemBuilder: (BuildContext context, int index) {
-        Record record = _selectedEvents[index];
-        double heightDifference = record.height - _previousHeight;
-        double weightDifference = record.weight - _previousWeight;
-        _previousHeight = record.height;
-        _previousWeight = record.weight;
+  if (_selectedEvents.isEmpty) {
+    return const SizedBox();
+  }
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: _selectedEvents.length,
+    itemBuilder: (BuildContext context, int index) {
+      Record record = _selectedEvents[index];
+      Record? previousRecord;
+
+      if (index > 0) {
+        previousRecord = _selectedEvents[index - 1];
+      } else {
+        DateTime previousDay = _selected!.subtract(const Duration(days: 1));
+        previousRecord = _events[previousDay]?.isNotEmpty == true ? _events[previousDay]!.last : null;
+      }
+
+      double heightDifference = previousRecord != null ? record.height - previousRecord.height : 0.0;
+      double weightDifference = previousRecord != null ? record.weight - previousRecord.weight : 0.0;
+
+      if (previousRecord == null) {
+        heightDifference = record.height;
+        weightDifference = record.weight;
+      }
 
         return ListTile(
           title: Column(
