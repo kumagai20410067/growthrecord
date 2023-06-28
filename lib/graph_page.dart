@@ -26,7 +26,7 @@ class _GraphPageState extends State<GraphPage>{
     return Scaffold(
       appBar:AppBar(
         automaticallyImplyLeading: false,//デフォルトの戻るボタンを削除
-        title: const Text(''),
+          title: Text('${widget.selectedPet}の成長記録'),
         ),
 body: Padding(
   padding:const EdgeInsets.all(16),
@@ -34,17 +34,36 @@ body: Padding(
           LineChartData(
             lineBarsData: [
             LineChartBarData(spots: const [
-              FlSpot(1, 323),
-              FlSpot(2, 538),
-              FlSpot(3, 368),
-              FlSpot(4, 259),
-              FlSpot(5, 551),
-              FlSpot(6, 226),
-              FlSpot(7, 268),
-              FlSpot(8, 296),
-              FlSpot(9, 203),
-              FlSpot(10, 246),
-              FlSpot(11, 345),
+              FlSpot(1, 523),
+              FlSpot(2, 524),
+              FlSpot(3, 525),
+              FlSpot(4, 526),
+              FlSpot(5, 527),
+              FlSpot(6, 528),
+              FlSpot(7, 529),
+              FlSpot(8, 530),
+              FlSpot(9, 531),
+              FlSpot(10, 532),
+              FlSpot(11, 533),
+              FlSpot(12, 534),
+              FlSpot(13, 535),
+              FlSpot(14, 536),
+              FlSpot(15, 537),
+              FlSpot(16, 538),
+              FlSpot(17, 539),
+              FlSpot(18, 540),
+              FlSpot(19, 541),
+              FlSpot(20, 542),
+              FlSpot(21, 543),
+              FlSpot(22, 544),
+              FlSpot(23, 545),
+              FlSpot(24, 546),
+              FlSpot(25, 547),
+              FlSpot(26, 548),
+              FlSpot(27, 549),
+              FlSpot(28, 550),
+              FlSpot(29, 551),
+              FlSpot(30, 552),
             ])
           ],
           titlesData: const FlTitlesData(
@@ -89,10 +108,7 @@ bottomNavigationBar: BottomNavigationBar(
              );
                break;
               case 2:
-                Navigator.push(
-                context, 
-                MaterialPageRoute(builder: (context) => GraphPage(selectedPet: widget.selectedPet,)),
-             );
+                // 現在のページ
                break;
             }
           },

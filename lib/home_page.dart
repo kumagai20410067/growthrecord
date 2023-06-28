@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:growthrecord/graph_page.dart';
 import 'package:growthrecord/select_page.dart';
 import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:growthrecord/select_page.dart';
 
 class Record{
   final double height;
@@ -62,7 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Record> _selectedEvents = [];
   bool _isRecordExisting= false;
 
-  
 @override
 void initState(){
   super.initState();
@@ -109,18 +106,19 @@ void saveEvents(){
   _prefs.setString('events',encodedEvents);
 }
 //記録の追加
-void addRecord(DateTime date,Record record){
-  setState((){
-    if(_events[date] != null){
+void addRecord(DateTime date, Record record) {
+  setState(() {
+    if (_events[date] != null) {
+      _events[date]!.add(record);
+    } else {
       _events[date] = [record];
-    }else{
-      _events[date] = [record];
-      _recordExistenceMap[date]= true;
+      _recordExistenceMap[date] = true;
     }
     _selectedEvents = _events[date]!;
   });
   saveEvents();
 }
+
 //記録の消去
 void deleteRecord(DateTime date,Record record){
   setState((){
@@ -141,10 +139,20 @@ return ListView.builder(
   shrinkWrap: true,//ListViewの高さをlistview内で表示している要素をすべて表示したときの高さにする
   physics: const NeverScrollableScrollPhysics(),//スクロール不可設定
   itemCount: _selectedEvents.length,
-  itemBuilder: (BuildContext context,int index){
+  itemBuilder: (
+    BuildContext context,int index){
     Record record = _selectedEvents[index];
-    return ListTile(
-      title: Text('体長： ${record.height}cm\n体重：${record.weight}g\nメモ：${record.memo}'),
+        
+       return ListTile(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+           children: [
+              Text('体長： ${record.height}cm'),
+              Text('体重： ${record.weight}g'),
+              Text('メモ： ${record.memo}'),
+              
+               ],
+  ),
       trailing: IconButton(
         icon: const Icon(Icons.delete),
         onPressed:(){
@@ -184,7 +192,7 @@ return ListView.builder(
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false,//デフォルトの戻るボタンを削除
           title: Text('${widget.selectedPet}の成長記録'),
         ),
 
@@ -227,7 +235,9 @@ return ListView.builder(
             context: context,
            builder: (BuildContext context){
             return AlertDialog(
-              title:  _isRecordExisting ? const Text('成長記録を更新する') : const Text('成長記録を入力する'),
+              title:  _isRecordExisting 
+              ? const Text('成長記録を更新する') 
+              : const Text('成長記録を入力する'),
               content:SingleChildScrollView(
                 child:Column(
                 mainAxisSize: MainAxisSize.min,//余りのスペースをなくす
@@ -236,7 +246,6 @@ return ListView.builder(
                   TextFormField(
                     controller: _heightController,
                     keyboardType: TextInputType.number,//キーボード入力を数字入力に変更
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],//数字のみ入力可能に
                     decoration: const InputDecoration(
                       labelText: '体長（cm）',
                     ),   
@@ -246,7 +255,6 @@ return ListView.builder(
                   TextFormField(
                     controller: _weightController,
                     keyboardType: TextInputType.number,//キーボード入力を数字入力に変更
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],//数字のみ入力可能に
                     decoration: const InputDecoration(
                       labelText: '体重（g）',
                     ),   
@@ -336,10 +344,7 @@ return ListView.builder(
              );
                break;
                case 1:
-                Navigator.push(
-                context, 
-                MaterialPageRoute(builder: (context) =>  MyHomePage(selectedPet: widget.selectedPet)),
-             );
+                //現在のページ
                break;
               case 2:
                 Navigator.push(
