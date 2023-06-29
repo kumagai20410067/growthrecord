@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:growthrecord/graph_page.dart';
 import 'package:growthrecord/select_page.dart';
-import 'package:table_calendar/table_calendar.dart';//カレンダー表示用
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Record {
@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _memoController = TextEditingController();
+  final TextEditingController _memoController   = TextEditingController();
 
   List<Record> _selectedEvents = [];
   bool _isRecordExisting = false;
@@ -65,10 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     initializeSharedPreferences();
-
-    //アプリを開いたタイミングで開いた日付を選択した状態にする
-    _focused = DateTime.now();
-    _selected = DateTime.now();
   }
 
   void initializeSharedPreferences() async {
@@ -252,6 +248,15 @@ class _MyHomePageState extends State<MyHomePage> {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
+              _heightController.text = _isRecordExisting
+                  ? _selectedEvents[0].height.toString()
+                  : '';
+              _weightController.text = _isRecordExisting
+                  ? _selectedEvents[0].weight.toString()
+                  : '';
+              _memoController.text = _isRecordExisting
+                  ? _selectedEvents[0].memo
+                  : '';
                   return AlertDialog(
                     title: _isRecordExisting
                         ? const Text('成長記録を更新する')
