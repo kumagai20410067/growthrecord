@@ -346,10 +346,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.date_range), label: 'CaLendar'),
-          BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Graph'),
+            icon: Icon(Icons.home),
+             label: 'Home'
+             ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.date_range),
+               label: 'CaLendar'
+               ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.show_chart), 
+            label: 'Graph'
+            ),
         ],
         onTap: (int index) {
           setState(() {
@@ -364,6 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
               break;
             case 1:
+            //現在のページ
               break;
             case 2:
               Navigator.push(

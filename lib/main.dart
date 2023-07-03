@@ -14,10 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'GROWTH RECORD',
       theme: ThemeData(
-        primarySwatch: Colors.purple,fontFamily: 'NotoSansJP'
-      ),
+        primarySwatch: Colors.purple,
+        fontFamily: 'NotoSansJP',
+              ),
       home: const SelectPage(),
     );
   }
 }
-
