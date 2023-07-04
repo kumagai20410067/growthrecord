@@ -6,7 +6,7 @@ class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
 
   @override
-   State<SelectPage> createState() => _SelectPageState();
+  State<SelectPage> createState() => _SelectPageState();
 }
 
 class _SelectPageState extends State<SelectPage> {
@@ -104,9 +104,16 @@ class _SelectPageState extends State<SelectPage> {
             ),
           Expanded(
             child: ListView.builder(
-              itemCount: _petList.length,
+              itemCount: _petList.length * 2 - 1,
               itemBuilder: (BuildContext context, int index) {
-                String petName = _petList[index];
+                if (index.isOdd) {
+                  return const Divider(
+                    color: Colors.grey,
+                    height: 20,
+                  );
+                }
+                int petIndex = index ~/ 2;
+                String petName = _petList[petIndex];
                 return ListTile(
                   title: Text(petName),
                   trailing: Row(
@@ -115,13 +122,13 @@ class _SelectPageState extends State<SelectPage> {
                       IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
-                          _showEditDialog(context, petName, index);
+                          _showEditDialog(context, petName, petIndex);
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          _showDeleteDialog(context, index);
+                          _showDeleteDialog(context, petIndex);
                         },
                       ),
                     ],
@@ -142,51 +149,48 @@ class _SelectPageState extends State<SelectPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyHomePage(
-          selectedPet: selectedPet
-        ),
+        builder: (context) => MyHomePage(selectedPet: selectedPet),
       ),
     );
   }
 
-void _showEditDialog(BuildContext context, String currentName, int index) {
-  String newName = currentName;
-  TextEditingController editNameController =
-      TextEditingController(text: currentName);
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('名前の変更'),
-        content: TextField(
-          controller: editNameController,
-          onChanged: (value) {
-            newName = value;
-          },
-          decoration: const InputDecoration(
-            labelText: '名前を変更してください',
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('キャンセル'),
-            onPressed: () {
-              Navigator.of(context).pop();
+  void _showEditDialog(BuildContext context, String currentName, int index) {
+    String newName = currentName;
+    TextEditingController editNameController =
+        TextEditingController(text: currentName);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('名前の変更'),
+          content: TextField(
+            controller: editNameController,
+            onChanged: (value) {
+              newName = value;
             },
+            decoration: const InputDecoration(
+              labelText: '名前を変更してください',
+            ),
           ),
-          TextButton(
-            child: const Text('保存'),
-            onPressed: () {
-              updatePetName(newName, index);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: [
+            TextButton(
+              child: const Text('キャンセル'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('保存'),
+              onPressed: () {
+                updatePetName(newName, index);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showDeleteDialog(BuildContext context, int index) {
     showDialog(
@@ -195,7 +199,7 @@ void _showEditDialog(BuildContext context, String currentName, int index) {
         return AlertDialog(
           title: const Text('削除の確認'),
           content: const Text('本当に削除しますか？'),
-          actions: [            
+          actions: [
             TextButton(
               child: const Text('削除'),
               onPressed: () {
