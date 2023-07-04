@@ -104,12 +104,13 @@ class _SelectPageState extends State<SelectPage> {
             ),
           Expanded(
             child: ListView.builder(
-              itemCount: _petList.length * 2 - 1,
+              itemCount: _petList.length * 2,
               itemBuilder: (BuildContext context, int index) {
                 if (index.isOdd) {
                   return const Divider(
                     color: Colors.grey,
                     height: 20,
+                    thickness: 1,
                   );
                 }
                 int petIndex = index ~/ 2;
