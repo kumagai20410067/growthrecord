@@ -37,9 +37,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _fetchDailyData(DateTime date) async {
     final formattedDate =
-        "${date.year}-${date.month}-${date.day}".padLeft(10, '0');
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
     final data =
         await _databaseHelper.retrieveData(widget.petId, formattedDate);
+    print('Fetched Data: $data'); //受けっとったデータの表示
     setState(() {
       _dailyData = data;
       _dataExists = data.isNotEmpty;
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
           TableCalendar(
             locale: 'ja_JP',
             firstDay: DateTime.utc(2023, 1, 1),
-            lastDay: DateTime.utc(2023, 12, 31),
+            lastDay: DateTime.utc(2024, 12, 31),
             focusedDay: _selectedDate,
             calendarFormat: CalendarFormat.month,
             onFormatChanged: (format) {},
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                   TextField(
                     controller: _weightController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: '体重（g）'),
+                    decoration: InputDecoration(labelText: '体重（kg）'),
                   ),
                   TextField(
                     controller: _memoController,
@@ -119,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('体長: ${data['height']}cm'),
-                        Text('体重: ${data['weight']}g'),
+                        Text('体重: ${data['weight']}kg'),
                         Text(
                             'メモ: ${data['memo'].isEmpty ? 'なし' : data['memo']}'),
                         if (_dailyData.length > 1 && index > 0) // 差分表示
@@ -170,7 +171,8 @@ class _HomePageState extends State<HomePage> {
 
   void _saveData() async {
     String formattedDate =
-        "${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}";
+        "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}";
+
     double height = double.tryParse(_heightController.text) ?? 0.0;
     double weight = double.tryParse(_weightController.text) ?? 0.0;
     String memo = _memoController.text;
@@ -194,6 +196,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _fetchDailyData(_selectedDate);
     });
+
+    final insertedData =
+        await _databaseHelper.retrieveData(petId, formattedDate);
+    print('Inserted Data: $insertedData'); //入力したデータの表示
   }
 
   void _showFormAlertDialog(BuildContext context) {
@@ -285,11 +291,11 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('前回からの差分:'),
+        Text('前回からの差分:'),
         if (heightDifference != 0)
           Text('  体長: ${heightDifference > 0 ? '+' : ''}$heightDifference cm'),
         if (weightDifference != 0)
-          Text('  体重: ${weightDifference > 0 ? '+' : ''}$weightDifference g'),
+          Text('  体重: ${weightDifference > 0 ? '+' : ''}$weightDifference kg'),
       ],
     );
   }

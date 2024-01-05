@@ -15,8 +15,9 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'record_database.db');
+    print('Database Path: $path'); // データベースファイルのパスを出力
     return await openDatabase(path,
-        version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 4, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -33,8 +34,11 @@ class DatabaseHelper {
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute('ALTER TABLE records ADD COLUMN pet_id INTEGER');
+    if (oldVersion < 4) {
+      // 既存のテーブルを削除
+      await db.execute('DROP TABLE IF EXISTS records');
+      // 新しいテーブルを作成
+      await _onCreate(db, newVersion);
     }
   }
 
@@ -53,6 +57,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> retrieveData(
       int petId, String date) async {
     Database db = await instance.database;
+    print('Retrieve Date: $date'); // 追加
     return await db.query('records',
         where: 'pet_id = ? AND date = ?', whereArgs: [petId, date]);
   }
