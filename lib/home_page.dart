@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growthrecord/graph_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:growthrecord/database_helper.dart' as DBHelper;
 import 'package:growthrecord/select_page.dart';
@@ -11,6 +12,7 @@ class HomePage extends StatefulWidget {
   final String selectedPet;
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
@@ -21,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   late DBHelper.DatabaseHelper _databaseHelper;
   late DateTime _selectedDate;
   bool _showForm = false;
-  bool _dataExists = false; // 新規追加か更新かのフラグ
+  bool _dataExists = false;
   List<Map<String, dynamic>> _dailyData = [];
 
   @override
@@ -40,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
     final data =
         await _databaseHelper.retrieveData(widget.petId, formattedDate);
-    print('Fetched Data: $data'); //受けっとったデータの表示
+    print('Fetched Data: $data');
     setState(() {
       _dailyData = data;
       _dataExists = data.isNotEmpty;
@@ -51,7 +53,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.selectedPet}の記録'),
+        automaticallyImplyLeading: false,
+        title: Text('${widget.selectedPet}の成長記録'),
       ),
       body: Column(
         children: [
@@ -76,9 +79,10 @@ class _HomePageState extends State<HomePage> {
           ),
           ElevatedButton(
             onPressed: () {
+              _updateData();
               _showFormAlertDialog(context);
             },
-            child: Text(_dataExists ? '更新する' : '入力する'),
+            child: Text(_dataExists ? '変更する' : '入力する'),
           ),
           if (_showForm)
             Padding(
@@ -88,23 +92,23 @@ class _HomePageState extends State<HomePage> {
                   TextField(
                     controller: _heightController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: '体長（cm）'),
+                    decoration: const InputDecoration(labelText: '全長（cm）'),
                   ),
                   TextField(
                     controller: _weightController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: '体重（kg）'),
+                    decoration: const InputDecoration(labelText: '体重（g）'),
                   ),
                   TextField(
                     controller: _memoController,
-                    decoration: InputDecoration(labelText: 'メモ'),
+                    decoration: const InputDecoration(labelText: 'メモ'),
                   ),
                   ElevatedButton(
                     onPressed: () {
                       _saveData();
-                      Navigator.of(context).pop(); // ダイアログを閉じる
+                      Navigator.of(context).pop();
                     },
-                    child: Text('保存'),
+                    child: const Text('保存'),
                   ),
                 ],
               ),
@@ -119,16 +123,14 @@ class _HomePageState extends State<HomePage> {
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('体長: ${data['height']}cm'),
-                        Text('体重: ${data['weight']}kg'),
+                        Text('全長: ${data['height']}cm'),
+                        Text('体重: ${data['weight']}g'),
                         Text(
                             'メモ: ${data['memo'].isEmpty ? 'なし' : data['memo']}'),
-                        if (_dailyData.length > 1 && index > 0) // 差分表示
-                          _buildDifferenceText(data, _dailyData[index - 1]),
                       ],
                     ),
                     trailing: IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: const Icon(Icons.delete),
                       onPressed: () {
                         _showDeleteConfirmationDialog(data['id']);
                       },
@@ -140,27 +142,35 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.pets),
             label: 'ペット選択',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'ホーム',
+            label: '記録',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),
             label: 'グラフ',
           ),
         ],
-        currentIndex: 1, // 初期表示はホーム
+        currentIndex: 1,
         onTap: (index) {
           if (index == 0) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SelectPage(),
+                builder: (context) => const SelectPage(),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GraphPage(
+                    petId: widget.petId, selectedPet: widget.selectedPet),
               ),
             );
           }
@@ -180,11 +190,9 @@ class _HomePageState extends State<HomePage> {
     int petId = widget.petId;
 
     if (_dataExists) {
-      // 既存データがある場合は更新
       await _databaseHelper.updateData(
           _dailyData[0]['id'], height, weight, memo);
     } else {
-      // 既存データがない場合は新規追加
       await _databaseHelper.insertData(
           petId, formattedDate, height, weight, memo);
     }
@@ -199,7 +207,7 @@ class _HomePageState extends State<HomePage> {
 
     final insertedData =
         await _databaseHelper.retrieveData(petId, formattedDate);
-    print('Inserted Data: $insertedData'); //入力したデータの表示
+    print('Inserted Data: $insertedData');
   }
 
   void _showFormAlertDialog(BuildContext context) {
@@ -207,8 +215,8 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('データ入力'),
-          contentPadding: EdgeInsets.zero, // 余白を無効にする
+          title: const Text('データ入力'),
+          contentPadding: EdgeInsets.zero,
           content: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -217,16 +225,16 @@ class _HomePageState extends State<HomePage> {
                 TextField(
                   controller: _heightController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: '体長（cm）'),
+                  decoration: const InputDecoration(labelText: '全長（cm）'),
                 ),
                 TextField(
                   controller: _weightController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: '体重（g）'),
+                  decoration: const InputDecoration(labelText: '体重（g）'),
                 ),
                 TextField(
                   controller: _memoController,
-                  decoration: InputDecoration(labelText: 'メモ'),
+                  decoration: const InputDecoration(labelText: 'メモ'),
                 ),
               ],
             ),
@@ -234,16 +242,16 @@ class _HomePageState extends State<HomePage> {
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // ダイアログを閉じる
+                Navigator.of(context).pop();
               },
-              child: Text('キャンセル'),
+              child: const Text('キャンセル'),
             ),
             ElevatedButton(
               onPressed: () {
                 _saveData();
-                Navigator.of(context).pop(); // ダイアログを閉じる
+                Navigator.of(context).pop();
               },
-              child: Text('保存'),
+              child: const Text('保存'),
             ),
           ],
         );
@@ -251,26 +259,37 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+// 変更ボタンが押された時の処理
+  void _updateData() {
+    // すでに入力されているデータが存在するか確認
+    if (_dailyData.isNotEmpty) {
+      // 入力フォームに既存のデータをセット
+      _heightController.text = _dailyData[0]['height'].toString();
+      _weightController.text = _dailyData[0]['weight'].toString();
+      _memoController.text = _dailyData[0]['memo'];
+    }
+  }
+
   void _showDeleteConfirmationDialog(int dataId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('削除の確認'),
-          content: Text('このデータを削除しますか？'),
+          title: const Text('削除の確認'),
+          content: const Text('このデータを削除しますか？'),
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // ダイアログを閉じる
+                Navigator.of(context).pop();
               },
-              child: Text('キャンセル'),
+              child: const Text('キャンセル'),
             ),
             ElevatedButton(
               onPressed: () {
                 _deleteData(dataId);
-                Navigator.of(context).pop(); // ダイアログを閉じる
+                Navigator.of(context).pop();
               },
-              child: Text('削除'),
+              child: const Text('削除'),
             ),
           ],
         );
@@ -281,22 +300,5 @@ class _HomePageState extends State<HomePage> {
   void _deleteData(int id) async {
     await _databaseHelper.deleteData(id);
     _fetchDailyData(_selectedDate);
-  }
-
-  Widget _buildDifferenceText(
-      Map<String, dynamic> currentData, Map<String, dynamic> previousData) {
-    final heightDifference = currentData['height'] - previousData['height'];
-    final weightDifference = currentData['weight'] - previousData['weight'];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('前回からの差分:'),
-        if (heightDifference != 0)
-          Text('  体長: ${heightDifference > 0 ? '+' : ''}$heightDifference cm'),
-        if (weightDifference != 0)
-          Text('  体重: ${weightDifference > 0 ? '+' : ''}$weightDifference kg'),
-      ],
-    );
   }
 }

@@ -1,93 +1,339 @@
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:flutter/material.dart';
-// import 'package:growthrecord/home_page.dart';
-// import 'package:growthrecord/select_page.dart';
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:growthrecord/database_helper.dart' as DBHelper;
+import 'package:growthrecord/home_page.dart';
+import 'package:growthrecord/select_page.dart';
 
-// class GraphPage extends StatefulWidget {
-//   final String selectedPet;
+class GraphPage extends StatefulWidget {
+  const GraphPage({Key? key, required this.petId, required this.selectedPet})
+      : super(key: key);
 
-//   const GraphPage({Key? key, required this.selectedPet}) : super(key: key);
+  final int petId;
+  final String selectedPet;
 
-//   @override
-//   State<GraphPage> createState() => _GraphPageState();
-// }
+  @override
+  _GraphPageState createState() => _GraphPageState();
+}
 
-// class _GraphPageState extends State<GraphPage> {
-//   int _currentIndex = 2;
+class _GraphPageState extends State<GraphPage> {
+  late DBHelper.DatabaseHelper _databaseHelper;
+  int _selectedGraphIndex = 0;
+  int _currentIndex = 2;
+  DateTime _selectedMonth = DateTime.now();
 
-//   @override
-//   void initState() {
-//     super.initState();
-//   }
+  @override
+  void initState() {
+    super.initState();
+    _databaseHelper = DBHelper.DatabaseHelper.instance;
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false, //デフォルトの戻るボタンを削除
-//         title: Text('${widget.selectedPet}の成長記録'),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16),
-//         child: LineChart(
-//           LineChartData(
-//               lineBarsData: [
-//                 LineChartBarData(spots: const [
-//                   FlSpot(1, 523),
-//                   FlSpot(2, 524),
-//                   FlSpot(3, 525),
-//                   FlSpot(4, 526),
-//                   FlSpot(5, 527),
-//                   FlSpot(6, 528),
-//                   FlSpot(7, 529),
-//                 ])
-//               ],
-//               titlesData: const FlTitlesData(
-//                 leftTitles: AxisTitles(
-//                     sideTitles: SideTitles(showTitles: false)), //左のタイトルを非表示
-//                 topTitles: AxisTitles(
-//                     sideTitles: SideTitles(showTitles: false)), //上のタイトルを非表示
-//               )),
-//         ),
-//       ),
-// //フッター
-//       bottomNavigationBar: BottomNavigationBar(
-//         items: const [
-//           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-//           BottomNavigationBarItem(
-//               icon: Icon(Icons.date_range), label: 'CaLendar'),
-//           BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Graph'),
-//         ],
-//         onTap: (int index) {
-//           setState(() {
-//             _currentIndex = index;
-//           });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text('${widget.selectedPet}の成長グラフ'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // 中央に配置
+                  children: [
+                    Row(
+                      children: [
+                        _buildGraphSelector(0, '全長'),
+                        const SizedBox(width: 24), //ボタンの間隔を調整
+                        _buildGraphSelector(1, '体重'),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        _selectPreviousMonth();
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                    Text(
+                      '${_selectedMonth.year}年${_selectedMonth.month}月',
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _selectNextMonth();
+                      },
+                      icon: const Icon(Icons.arrow_forward),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          _buildGraphArea(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pets),
+            label: 'ペット選択',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '記録',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.show_chart),
+            label: 'グラフ',
+          ),
+        ],
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
 
-//           switch (index) {
-//             case 0:
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(builder: (context) => const SelectPage()),
-//               );
-//               break;
-//             case 1:
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                     builder: (context) =>
-//                         MyHomePage(selectedPet: widget.selectedPet)
-//                         ),
-//               );
-//               break;
-//             case 2:
-//               // 現在のページ
-//               break;
-//           }
-//         },
-//         selectedItemColor: Colors.purple,
-//         unselectedItemColor: Colors.grey,
-//         currentIndex: _currentIndex,
-//       ),
-//     );
-//   }
-// }
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SelectPage(),
+              ),
+            );
+          } else if (index == 1) {
+            Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(
+                  petId: widget.petId,
+                  selectedPet: widget.selectedPet,
+                ),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildGraphSelector(int index, String label) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedGraphIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: _selectedGraphIndex == index ? Colors.blue : Colors.grey[300],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: _selectedGraphIndex == index ? Colors.white : Colors.black,
+            fontSize: 18, //全長と体重選択ボタンの文字サイズ変更
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGraphArea() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _databaseHelper.retrieveMonthlyDataForGraph(
+            widget.petId,
+            '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}',
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return const Text('エラーが発生しました');
+            } else if (snapshot.hasData) {
+              final graphData = snapshot.data ?? [];
+
+              return LineChart(
+                LineChartData(
+                  // タッチ操作時の設定
+                  lineTouchData: const LineTouchData(
+                    handleBuiltInTouches: true, // タッチ時のアクションの有無
+                    getTouchedSpotIndicator:
+                        defaultTouchedIndicators, // インジケーターの設定
+                    touchTooltipData: LineTouchTooltipData(
+                      // ツールチップの設定
+                      getTooltipItems: defaultLineTooltipItem, // 表示文字設定
+                      tooltipBgColor: Colors.white, // 背景の色
+                      tooltipRoundedRadius: 2.0, // 角丸
+                    ),
+                  ),
+
+                  //背景グリッド線の設定
+                  gridData: const FlGridData(
+                    show: true,
+                    drawVerticalLine: true,
+                    horizontalInterval: 1.0,
+                    verticalInterval: 1.0,
+                    // getDrawingHorizontalLine: (value){
+                    //   return const FlLine(
+                    //     color: Color(0xff37434d),
+                    //     strokeWidth: 1.0,
+                    //   );
+                    // },
+                    // getDrawingVerticalLine: (value){
+                    //   return FlLine(
+                    //     color: Color(0xff37434d),
+                    //     strokeWidth: 1.0,
+                    //   );
+                    // },
+                  ),
+
+                  //グラフのタイトルの設定
+                  titlesData: const FlTitlesData(
+                    show: true,
+                    // topTitles: AxisTitles(
+                    //     axisNameWidget: Text(
+                    //   "月",
+                    // )),
+                    bottomTitles: AxisTitles(
+                      axisNameWidget: Text(
+                        "【日付】",
+                        style: TextStyle(
+                          color: Color(0xff68737d),
+                        ),
+                      ),
+                      axisNameSize: 22.0,
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                      ),
+                    ),
+                  ),
+
+                  // グラフの外枠線
+                  borderData: FlBorderData(
+                    show: true, // 外枠線の有無
+                    border: Border.all(
+                      // 外枠線の色
+                      color: Color(0xff37434d),
+                    ),
+                  ),
+
+                  // グラフのx軸y軸のの表示数
+                  minX: 1.0,
+                  maxX: graphData.length.toDouble(),
+                  minY: graphData.isEmpty
+                      ? 0
+                      : graphData
+                              .map((data) => _selectedGraphIndex == 0
+                                  ? data['height']
+                                  : data['weight'])
+                              .reduce((a, b) => a < b ? a : b) -
+                          1,
+                  maxY: graphData.isEmpty
+                      ? 100
+                      : graphData
+                              .map((data) => _selectedGraphIndex == 0
+                                  ? data['height']
+                                  : data['weight'])
+                              .reduce((a, b) => a > b ? a : b) +
+                          1,
+                  lineBarsData: [
+                    if (_selectedGraphIndex == 0)
+                      LineChartBarData(
+                        spots: graphData
+                            .asMap()
+                            .entries
+                            .map(
+                              (entry) => FlSpot(
+                                entry.key.toDouble() + 1,
+                                entry.value['height'].toDouble(),
+                              ),
+                            )
+                            .toList(),
+                        isCurved: true,
+                        barWidth: 1.0,
+                        isStrokeCapRound: false,
+                        dotData: FlDotData(
+                          show: true, // 座標のドット表示の有無
+                          getDotPainter: (spot, percent, barData, index) =>
+                              FlDotCirclePainter(
+                            // ドットの詳細設定
+                            radius: 2.0,
+                            color: Colors.blue,
+                            strokeWidth: 2.0,
+                            strokeColor: Colors.blue,
+                          ),
+                        ),
+                        belowBarData: BarAreaData(
+                          // チャート線下部に色を付ける場合の設定
+                          show: false, // チャート線下部の表示の有無
+                        ),
+                      ),
+                    if (_selectedGraphIndex == 1)
+                      LineChartBarData(
+                        spots: graphData
+                            .asMap()
+                            .entries
+                            .map(
+                              (entry) => FlSpot(
+                                entry.key.toDouble() + 1,
+                                entry.value['weight'].toDouble(),
+                              ),
+                            )
+                            .toList(),
+                        isCurved: true,
+                        barWidth: 1.0,
+                        isStrokeCapRound: false,
+                        dotData: FlDotData(
+                          show: true, // 座標のドット表示の有無
+                          getDotPainter: (spot, percent, barData, index) =>
+                              FlDotCirclePainter(
+                            // ドットの詳細設定
+                            radius: 2.0,
+                            color: Colors.blue,
+                            strokeWidth: 2.0,
+                            strokeColor: Colors.blue,
+                          ),
+                        ),
+                        belowBarData: BarAreaData(
+                          // チャート線下部に色を付ける場合の設定
+                          show: false, // チャート線下部の表示の有無
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            } else {
+              return const Text('データがありません');
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  void _selectPreviousMonth() {
+    setState(() {
+      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
+    });
+  }
+
+  void _selectNextMonth() {
+    setState(() {
+      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
+    });
+  }
+}

@@ -15,9 +15,9 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'record_database.db');
-    print('Database Path: $path'); // データベースファイルのパスを出力
+    print('Database Path: $path');
     return await openDatabase(path,
-        version: 4, onCreate: _onCreate, onUpgrade: _onUpgrade);
+        version: 6, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -26,30 +26,25 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pet_id INTEGER,
         date TEXT,
-        weight REAL,
         height REAL,
+        weight REAL,
         memo TEXT
       )
     ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 4) {
-      // 既存のテーブルを削除
-      await db.execute('DROP TABLE IF EXISTS records');
-      // 新しいテーブルを作成
-      await _onCreate(db, newVersion);
-    }
+    if (oldVersion < 6) {}
   }
 
   Future<int> insertData(
-      int petId, String date, double weight, double height, String memo) async {
+      int petId, String date, double height, double weight, String memo) async {
     Database db = await instance.database;
     return await db.insert('records', {
       'pet_id': petId,
       'date': date,
-      'weight': weight,
       'height': height,
+      'weight': weight,
       'memo': memo,
     });
   }
@@ -57,19 +52,19 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> retrieveData(
       int petId, String date) async {
     Database db = await instance.database;
-    print('Retrieve Date: $date'); // 追加
+    print('Retrieve Date: $date');
     return await db.query('records',
         where: 'pet_id = ? AND date = ?', whereArgs: [petId, date]);
   }
 
   Future<int> updateData(
-      int id, double weight, double height, String memo) async {
+      int id, double height, double weight, String memo) async {
     Database db = await instance.database;
     return await db.update(
         'records',
         {
-          'weight': weight,
           'height': height,
+          'weight': weight,
           'memo': memo,
         },
         where: 'id = ?',
@@ -79,5 +74,22 @@ class DatabaseHelper {
   Future<int> deleteData(int id) async {
     Database db = await instance.database;
     return await db.delete('records', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<List<Map<String, dynamic>>> retrieveMonthlyDataForGraph(
+      int petId, String yearMonth) async {
+    Database db = await instance.database;
+
+    // データベースから指定された年月のデータを取得
+    List<Map<String, dynamic>> data = await db.query(
+      'records',
+      where: 'pet_id = ? AND strftime(\'%Y-%m\', date) = ?',
+      whereArgs: [petId, yearMonth],
+      orderBy: 'date ASC',
+    );
+
+    print('Retrieved Graph Data for $yearMonth: $data');
+
+    return data;
   }
 }
