@@ -5,7 +5,7 @@ import 'package:growthrecord/home_page.dart';
 import 'package:growthrecord/select_page.dart';
 
 class GraphPage extends StatefulWidget {
-  GraphPage({Key? key, required this.petId, required this.selectedPet})
+  const GraphPage({Key? key, required this.petId, required this.selectedPet})
       : super(key: key);
 
   final int petId;
@@ -48,13 +48,13 @@ class _GraphPageState extends State<GraphPage> {
                     Row(
                       children: [
                         _buildGraphSelector(0, '全長'),
-                        SizedBox(width: 24), //ボタンの間隔を調整
+                        const SizedBox(width: 24), //ボタンの間隔を調整
                         _buildGraphSelector(1, '体重'),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -62,17 +62,17 @@ class _GraphPageState extends State<GraphPage> {
                       onPressed: () {
                         _selectPreviousMonth();
                       },
-                      icon: Icon(Icons.arrow_back),
+                      icon: const Icon(Icons.arrow_back),
                     ),
                     Text(
                       '${_selectedMonth.year}年${_selectedMonth.month}月',
-                      style: TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 20),
                     ),
                     IconButton(
                       onPressed: () {
                         _selectNextMonth();
                       },
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                     ),
                   ],
                 ),
@@ -83,7 +83,7 @@ class _GraphPageState extends State<GraphPage> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.pets),
             label: 'ペット選択',
@@ -107,7 +107,7 @@ class _GraphPageState extends State<GraphPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => SelectPage(),
+                builder: (context) => const SelectPage(),
               ),
             );
           } else if (index == 1) {
@@ -135,7 +135,7 @@ class _GraphPageState extends State<GraphPage> {
         });
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: _selectedGraphIndex == index ? Colors.blue : Colors.grey[300],
           borderRadius: BorderRadius.circular(16),
@@ -154,7 +154,7 @@ class _GraphPageState extends State<GraphPage> {
   Widget _buildGraphArea() {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _databaseHelper.retrieveMonthlyDataForGraph(
             widget.petId,
@@ -162,16 +162,14 @@ class _GraphPageState extends State<GraphPage> {
           ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             } else if (snapshot.hasError) {
-              return Text('エラーが発生しました');
+              return const Text('エラーが発生しました');
             } else if (snapshot.hasData) {
               final graphData = snapshot.data ?? [];
-              print("Graph Data: $graphData"); // 確認用
               // 空でない場合のみグラフを表示
               if (graphData.isNotEmpty) {
                 dateList = _getDateList(graphData);
-                print("Date List: $dateList"); // 確認用
 
                 return LineChart(
                   LineChartData(
@@ -271,8 +269,7 @@ class _GraphPageState extends State<GraphPage> {
                             ),
                           ),
                           belowBarData: BarAreaData(
-                            // チャート線下部に色を付ける場合の設定
-                            show: false, // チャート線下部の表示の有無
+                            show: false,
                           ),
                         ),
                       if (_selectedGraphIndex == 1)

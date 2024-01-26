@@ -7,7 +7,6 @@ import 'package:growthrecord/select_page.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.petId, required this.selectedPet})
       : super(key: key);
-
   final int petId;
   final String selectedPet;
 
@@ -22,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   late TextEditingController _memoController;
   late DBHelper.DatabaseHelper _databaseHelper;
   late DateTime _selectedDate;
+  CalendarFormat _calendarFormat = CalendarFormat.month;
   bool _showForm = false;
   bool _dataExists = false;
   List<Map<String, dynamic>> _dailyData = [];
@@ -42,7 +42,6 @@ class _HomePageState extends State<HomePage> {
         "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
     final data =
         await _databaseHelper.retrieveData(widget.petId, formattedDate);
-    print('Fetched Data: $data');
     setState(() {
       _dailyData = data;
       _dataExists = data.isNotEmpty;
@@ -61,10 +60,14 @@ class _HomePageState extends State<HomePage> {
           TableCalendar(
             locale: 'ja_JP',
             firstDay: DateTime.utc(2023, 1, 1),
-            lastDay: DateTime.utc(2024, 12, 31),
+            lastDay: DateTime.utc(2025, 12, 31),
             focusedDay: _selectedDate,
-            calendarFormat: CalendarFormat.month,
-            onFormatChanged: (format) {},
+            calendarFormat: _calendarFormat,
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
             startingDayOfWeek: StartingDayOfWeek.monday,
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
@@ -82,7 +85,7 @@ class _HomePageState extends State<HomePage> {
               _updateData();
               _showFormAlertDialog(context);
             },
-            child: Text(_dataExists ? '変更する' : '入力する'),
+            child: Text(_dataExists ? '更新する' : '入力する'),
           ),
           if (_showForm)
             Padding(
@@ -148,11 +151,11 @@ class _HomePageState extends State<HomePage> {
             label: 'ペット選択',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.calendar_month),
             label: '記録',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart),
+            icon: Icon(Icons.leaderboard),
             label: 'グラフ',
           ),
         ],
@@ -204,10 +207,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _fetchDailyData(_selectedDate);
     });
-
-    final insertedData =
-        await _databaseHelper.retrieveData(petId, formattedDate);
-    print('Inserted Data: $insertedData');
   }
 
   void _showFormAlertDialog(BuildContext context) {

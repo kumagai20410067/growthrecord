@@ -64,18 +64,18 @@ class _SelectPageState extends State<SelectPage> {
   final TextEditingController _petNameController = TextEditingController();
   bool _isAddingPet = false;
 
-  @override
-  void initState() {
-    super.initState();
+  _SelectPageState() {
     _databaseHelper = DatabaseHelper.instance;
     loadPetList();
   }
 
   void loadPetList() async {
-    List<Map<String, dynamic>> pets = await _databaseHelper.retrievePets();
-    setState(() {
-      _petList = pets;
-    });
+    try {
+      List<Map<String, dynamic>> pets = await _databaseHelper.retrievePets();
+      setState(() {
+        _petList = pets;
+      });
+    } catch (e) {}
   }
 
   void addPet(String petName) async {

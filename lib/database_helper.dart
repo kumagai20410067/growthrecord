@@ -14,7 +14,6 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'record_database.db');
-    print('Database Path: $path');
     return await openDatabase(path,
         version: 6, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
@@ -51,7 +50,6 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> retrieveData(
       int petId, String date) async {
     Database db = await instance.database;
-    print('Retrieve Date: $date');
     return await db.query('records',
         where: 'pet_id = ? AND date = ?', whereArgs: [petId, date]);
   }
@@ -79,15 +77,13 @@ class DatabaseHelper {
       int petId, String yearMonth) async {
     Database db = await instance.database;
 
-    // データベースから指定された年月のデータを取得
+    // 指定された年月のデータを取得
     List<Map<String, dynamic>> data = await db.query(
       'records',
       where: 'pet_id = ? AND strftime(\'%Y-%m\', date) = ?',
       whereArgs: [petId, yearMonth],
       orderBy: 'date ASC',
     );
-
-    print('Retrieved Graph Data for $yearMonth: $data');
 
     return data;
   }
