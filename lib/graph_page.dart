@@ -162,16 +162,14 @@ class _GraphPageState extends State<GraphPage> {
           ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             } else if (snapshot.hasError) {
-              return Text('エラーが発生しました');
+              return const Text('エラーが発生しました');
             } else if (snapshot.hasData) {
               final graphData = snapshot.data ?? [];
-              print("Graph Data: $graphData"); // 確認用
               // 空でない場合のみグラフを表示
               if (graphData.isNotEmpty) {
                 dateList = _getDateList(graphData);
-                print("Date List: $dateList"); // 確認用
 
                 return LineChart(
                   LineChartData(
@@ -271,8 +269,7 @@ class _GraphPageState extends State<GraphPage> {
                             ),
                           ),
                           belowBarData: BarAreaData(
-                            // チャート線下部に色を付ける場合の設定
-                            show: false, // チャート線下部の表示の有無
+                            show: false,
                           ),
                         ),
                       if (_selectedGraphIndex == 1)
