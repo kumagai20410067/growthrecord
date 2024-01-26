@@ -1,0 +1,1 @@
+I/flutter (31332): Database Path: /data/user/0/com.example.growthrecord/databases/record_database.db
