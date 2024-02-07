@@ -39,7 +39,7 @@ class _GraphPageState extends State<GraphPage> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 Row(
@@ -218,7 +218,7 @@ class _GraphPageState extends State<GraphPage> {
                     borderData: FlBorderData(
                       show: true, // 外枠線の有無
                       border: Border.all(
-                        color: Color(0xff37434d), // 外枠線の色
+                        color: const Color(0xff37434d), // 外枠線の色
                       ),
                     ),
 
